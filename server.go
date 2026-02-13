@@ -488,7 +488,9 @@ func (s *Server) attachClient(cl *Client, listener string) error {
 	if expire && !cl.IsTakenOver() {
 		cl.ClearInflights()
 		s.UnsubscribeClient(cl)
-		s.Clients.Delete(cl.ID) // [MQTT-4.1.0-2] ![MQTT-3.1.2-23]
+		if current, ok := s.Clients.Get(cl.ID); ok && current == cl {
+			s.Clients.Delete(cl.ID) // [MQTT-4.1.0-2] ![MQTT-3.1.2-23]
+		}
 	}
 
 	return err
